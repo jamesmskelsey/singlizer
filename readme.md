@@ -5,6 +5,12 @@ Use `single.js` to combine a single html file that contains only the contents of
 
 This may only be useful for me, because I have a specific need to distribute files to coworkers who are Sailors, whose email system will strip any .zip files I send them. They have a ridiculously bad internet connection, the need for tools that are normally only available online, or are developed for them for some specific task they need to do.
 
+However, I suppose it might be useful for a student submitting projects to a class. I wouldn't know, I've never taken a class before.
+
+### Installation
+
+Use `npm i -g singlizer` to install singlizer globally. Run `singlizer init` in a folder to create a config file. Has no dependencies. Should not be depended on for anything. Run `singlizer` to "compile" your files.
+
 ### Configuration
 
 ```json
@@ -24,6 +30,8 @@ This may only be useful for me, because I have a specific need to distribute fil
 All of the config entries are optional, but setting them to blank files will cause problems.
 
 ### Usage
+
+Use `singlizer init` to create an initial configuration file in the folder you are working in. Modify it to fit your needs.
 
 Example files.
 
@@ -51,7 +59,7 @@ Example files.
   }
 ```
 
-Then, type: `node single.js`
+Then, type: `singlizer`
 
 Outputs:
 
