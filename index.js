@@ -1,32 +1,51 @@
+#!/usr/bin/env node
 console.log('Make a single file from a set of files specified in singlizer.json');
 
 const fs = require('fs');
-
+let config = {
+  title: "No title given"
+}
+const args = process.argv.slice(2);
 // Grab config file first thing
-let configFile = fs.createReadStream('singlizer.json');
-var config = {
-  title: "Singlized File",
-  htmlFile: 'index.html',
-  cssFile: 'default.css',
-  jsFiles: ['default.js'],
-  outputPath: './dist/',
-  outputFileName: 'index.html'
-};
+if (args[0] !== 'init') {
+  let configFile = fs.createReadStream('singlizer.json')
 
-configFile.on('readable', () => {
-  const info = JSON.parse(configFile.read())
-  
-  config = {
-    ...config,
-    ...info
-  };
-  console.log(info)
-})
+  configFile.on('readable', () => {
+    const info = JSON.parse(configFile.read())
+    if (info) {
+      config = {
+        ...info
+      };
+      console.log(config)
+    }
+  })
 
-// When the configuration file is done loading, we continue on.
-configFile.on('end', () => {
-  readAndOutput();
-})
+  // When the configuration file is done loading, we continue on.
+  configFile.on('end', () => {
+      readAndOutput()
+  })
+} else if (args[0] === 'init') {
+  initialize();
+} else {
+  console.log('Either you meant init or nothing. There are only two options.')
+}
+
+function initialize() {
+  console.log("Initializing 'singlizer.json' configuration file")
+  let configFile = fs.createWriteStream('./singlizer.json');
+  configFile.write(`
+    {
+      "title": "Singlizer",
+      "jsFiles": [
+        "./main.js"
+      ],
+      "cssFile": "./main.css",
+      "htmlFile": "./index.html",
+      "outputPath": "./dist/",
+      "outputFileName": "index.html"
+    }
+  `)
+}
 
 function readAndOutput() {
   const jsFiles = [];

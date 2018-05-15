@@ -1,10 +1,12 @@
-{
-  "title": "Singlizer",
-  "jsFiles": [
-    "main.js"
-  ],
-  "cssFile": "main.css",
-  "htmlFile": "index.html",
-  "outputPath": "./dist/",
-  "outputFileName": "index.html"
-}
+
+    {
+      "title": "Singlizer",
+      "jsFiles": [
+        "./main.js"
+      ],
+      "cssFile": "./main.css",
+      "htmlFile": "./index.html",
+      "outputPath": "./dist/",
+      "outputFileName": "index.html"
+    }
+  

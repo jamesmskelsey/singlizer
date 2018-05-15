@@ -2,7 +2,7 @@
   "name": "singlizer",
   "version": "0.1.0",
   "description": "Create a single file from an html file that only contains the content of a 'body' tag, a main css file, and any number of js files. Files are specified through a 'singlizer.json' config file.",
-  "main": "single.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,5 +11,8 @@
     "url": "singlizer"
   },
   "author": "James M Kelsey",
-  "license": "ISC"
+  "license": "ISC",
+  "bin": {
+    "singlizer": "./index.js"
+  }
 }
