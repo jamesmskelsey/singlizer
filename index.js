@@ -2,10 +2,12 @@
 console.log('Make a single file from a set of files specified in singlizer.json');
 
 const fs = require('fs');
+const args = process.argv.slice(2);
+
 let config = {
   title: "No title given"
 }
-const args = process.argv.slice(2);
+
 // Grab config file first thing
 if (args[0] !== 'init') {
   let configFile = fs.createReadStream('singlizer.json')
@@ -32,7 +34,7 @@ if (args[0] !== 'init') {
 
 function initialize() {
   console.log("Initializing 'singlizer.json' configuration file")
-  let configFile = fs.createWriteStream('./singlizer.json');
+  const configFile = fs.createWriteStream('./singlizer.json');
   configFile.write(`
     {
       "title": "Singlizer",
@@ -48,21 +50,10 @@ function initialize() {
 }
 
 function readAndOutput() {
-  const jsFiles = [];
   const h = fs.createReadStream(config.htmlFile);
   const c = fs.createReadStream(config.cssFile);
-  config.jsFiles.forEach((file) => {
-    let f = fs.createReadStream(file)
-    f.on('readable', () => {
-      let content = f.read();
-      if (content) {
-        jsFiles.push(`<script type='text/javascript'>${content}</script>`)
-      }
-      
-    })
-  })
-
   const title = config.title;
+
   let outputParts = {
     header: `
     <!DOCTYPE html>
@@ -78,6 +69,10 @@ function readAndOutput() {
     `,
     html: ``,
     css: ``,
+    jsFiles: [],
+    addJSFile: function (js) {
+      this.jsFiles.push(js)
+    },
     setHTML: function (html) {
       this.html = html;
     },
@@ -91,12 +86,24 @@ function readAndOutput() {
         <style>
           ${this.css}
         </style>
-        ${jsFiles.join("\n")}
+        ${this.jsFiles.join("\n")}
         ${this.ender}
       `
     }
   }
 
+  // Read in each of the js files from the configuration
+  // in the order they're given in singlizer.json
+  config.jsFiles.forEach((file) => {
+    let f = fs.createReadStream(file)
+    f.on('readable', () => {
+      let content = f.read();
+      if (content) {
+        outputParts.addJSFile(`<script type='text/javascript'>${content}</script>`)
+      }
+      
+    })
+  })
 
   h.on('readable', () => {
     let piece = h.read();
@@ -117,7 +124,6 @@ function readAndOutput() {
       let output = fs.createWriteStream(`${config.outputPath}${config.outputFileName}`);
       output.write(outputParts.getFile())
     });
-    console.log(jsFiles.join("\n"))
   })
 }
 
