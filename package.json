@@ -1,6 +1,6 @@
 {
   "name": "singlizer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create a single file from an html file that only contains the content of a 'body' tag, a main css file, and any number of js files. Files are specified through a 'singlizer.json' config file.",
   "main": "index.js",
   "scripts": {

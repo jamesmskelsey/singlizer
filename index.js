@@ -2,6 +2,8 @@
 console.log('Make a single file from a set of files specified in singlizer.json');
 
 const fs = require('fs');
+const {URL} = require('url');
+const https = require('https');
 const args = process.argv.slice(2);
 
 let config = {
@@ -49,6 +51,51 @@ function initialize() {
   `)
 }
 
+// Utility function to check if a url is valid - ie, treat as local file or url?
+function validURL(fileName) {
+  try {
+    let url = new URL(fileName)
+    // I only want a Boolean here, not a string.
+    return true
+  } catch (e) {
+    // Just discarding the error to instead output false.
+    return false
+  }
+}
+
+// Returns a promise that resolves to the file contents or an error.
+function getFile(fileName) {
+  if ( validURL(fileName) ) {
+    return new Promise( (resolve, rej) => {
+      let url = new URL(fileName);
+      https.get(url.href, (response) => {
+        let completeFile = ''
+        response.on('data', (data) => {
+          completeFile += data
+        })
+        .on('end', () => {
+          resolve(completeFile)
+        })
+        .on('error', (err) => {
+          rej(err)
+        })
+      })
+    })
+  } else {
+    return new Promise( (resolve, rej) => {
+      let f = fs.createReadStream(fileName)
+      f.on('readable', () => {
+        let content = f.read();
+        if (content) {
+          resolve(content)
+        }
+        
+      })
+    })
+  }
+  
+}
+
 function readAndOutput() {
   const h = fs.createReadStream(config.htmlFile);
   const c = fs.createReadStream(config.cssFile);
@@ -71,7 +118,7 @@ function readAndOutput() {
     css: ``,
     jsFiles: [],
     addJSFile: function (js) {
-      this.jsFiles.push(js)
+      this.jsFiles.push(`<script type='text/javascript'>${js}</script>`)
     },
     setHTML: function (html) {
       this.html = html;
@@ -94,15 +141,19 @@ function readAndOutput() {
 
   // Read in each of the js files from the configuration
   // in the order they're given in singlizer.json
-  config.jsFiles.forEach((file) => {
-    let f = fs.createReadStream(file)
-    f.on('readable', () => {
-      let content = f.read();
-      if (content) {
-        outputParts.addJSFile(`<script type='text/javascript'>${content}</script>`)
-      }
-      
+  let jsFilesPromisesArray = config.jsFiles.map((file) => {
+    return getFile(file)
+  })
+
+  Promise.all(jsFilesPromisesArray).then((values) => {
+    values.forEach((file) => {
+      outputParts.addJSFile(file)
     })
+
+    let distFolder = fs.mkdir('./dist', () => {
+      let output = fs.createWriteStream(`${config.outputPath}${config.outputFileName}`);
+      output.write(outputParts.getFile())
+    });
   })
 
   h.on('readable', () => {
@@ -120,10 +171,7 @@ function readAndOutput() {
   })
 
   c.on('end', () => {
-    let distFolder = fs.mkdir('./dist', () => {
-      let output = fs.createWriteStream(`${config.outputPath}${config.outputFileName}`);
-      output.write(outputParts.getFile())
-    });
+    
   })
 }
 
