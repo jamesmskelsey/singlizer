@@ -2,8 +2,7 @@
     {
       "title": "Singlizer",
       "jsFiles": [
-        "./main.js",
-        "https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"
+        "./main.js"
       ],
       "cssFile": "./main.css",
       "htmlFile": "./index.html",
