@@ -17,7 +17,8 @@ Use `npm i -g singlizer` to install singlizer globally. Run `singlizer init` in 
   {
     "title": "Singlizer",
     "jsFiles": [
-      "main.js"
+      "main.js",
+      "https://awesomejs.com/dist/whatever/sweet.min.js"
     ],
     "cssFile": "main.css",
     "htmlFile": "index.html",
@@ -28,6 +29,8 @@ Use `npm i -g singlizer` to install singlizer globally. Run `singlizer init` in 
 
 "jsFiles" must be an array of JavaScript files. It can include files in subfolders, don't forget './'
 All of the config entries are optional, but setting them to blank files will cause problems.
+
+Added in 0.1.2: jsFiles can now include a url if you'd like.
 
 ### Usage
 
